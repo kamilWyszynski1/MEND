@@ -1,0 +1,3 @@
+generate:
+	if ! which mockery ; echo "installing mockery" & then go install github.com/vektra/mockery/v2@v2.12.0 ; fi
+	go generate ./...
