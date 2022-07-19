@@ -11,6 +11,11 @@ import (
 
 //go:generate mockery --name=UserRepository --inpackage --filename=controller.mock.go
 // UserRepository provides functionality to manager User entity.
+//
+// NOTE: I had discussion some time ago with my coworkers about place where interfaces should be placed.
+// There was 2 approaches: 1. Wherever caller uses interface 2. Wherever some shared funcionalities could be abstracted.
+// Here I used 1st approach - we concluded that it's cleaner way of doing so and prevent import cycles.
+// Doing so in 2nd way would be defining it in "repository" package and use it here as "type UserController struct {client repository.Repository}".
 type UserRepository interface {
 	// Create creates new user.
 	Create(ctx context.Context, user models.User) error
@@ -62,6 +67,8 @@ func (u UserController) Create(c *gin.Context) {
 			}
 
 			This is omitted for simplicity.
+
+			Additionally errors from another layers should be mapped for user friendly messages.
 		*/
 
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -116,7 +123,7 @@ func (u UserController) Update(c *gin.Context) {
 
 	ctx := c.Request.Context()
 
-	if u.repo.Update(ctx, id, user); err != nil {
+	if err := u.repo.Update(ctx, id, user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "unknown error",
 			"details": err.Error(),
@@ -135,7 +142,7 @@ func (u UserController) Delete(c *gin.Context) {
 	}
 
 	ctx := c.Request.Context()
-	if u.repo.Delete(ctx, id); err != nil {
+	if err := u.repo.Delete(ctx, id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "unknown error",
 			"details": err.Error(),

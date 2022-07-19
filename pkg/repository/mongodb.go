@@ -14,6 +14,11 @@ type Mongo struct {
 	client *mongo.Collection // 'user' collection.
 }
 
+// NewMongo returns new Mongo instance.
+func NewMongo(client *mongo.Collection) *Mongo {
+	return &Mongo{client: client}
+}
+
 // Create inserts new user.
 func (m *Mongo) Create(ctx context.Context, user models.User) error {
 	_, err := m.client.InsertOne(ctx, user)
@@ -26,15 +31,15 @@ func (m *Mongo) Create(ctx context.Context, user models.User) error {
 // Get finds user with given id.
 func (m *Mongo) Get(ctx context.Context, id int) (*models.User, error) {
 	var user models.User
-	if err := m.client.FindOne(ctx, bson.D{{Key: "id", Value: id}}).Decode(&user); err != nil {
+	if err := m.client.FindOne(ctx, bson.D{{Key: "_id", Value: id}}).Decode(&user); err != nil {
 		return nil, fmt.Errorf("failed to find user, %w", err)
 	}
 	return &user, nil
 }
 
 // Update updates user entry.
-func (m *Mongo) Update(ctx context.Context, user models.User) error {
-	_, err := m.client.UpdateByID(ctx, user.ID, user)
+func (m *Mongo) Update(ctx context.Context, id int, user models.User) error {
+	_, err := m.client.UpdateByID(ctx, id, bson.D{{Key: "$set", Value: user}})
 	if err != nil {
 		return fmt.Errorf("failed to update user, %w", err)
 	}
