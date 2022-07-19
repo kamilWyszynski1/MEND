@@ -35,8 +35,6 @@ func run() int {
 		return 1
 	}
 
-	log.Println(config)
-
 	repo, err := createRepository(ctx, config)
 	if err != nil {
 		log.Printf("failed to init repository, %s\n", err)

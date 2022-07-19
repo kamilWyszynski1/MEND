@@ -6,11 +6,20 @@ This is a simple CRUD application that supports SQL(postgres) and NoSQL(mongodb)
 
 Make sure that you have go installed.
 
-1. Install dependencies.
+1. Make sure that you are running go version `1.17`.
+
+2.  Install dependencies.
 ```shell
 go mod download & go mod vendor
 ```
-2. Use docker-compose setup. App will run on `8080` port receiving only `https` traffic.
+
+3. TLS certs generation
+```shell
+openssl genrsa -out server.key 2048
+openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650
+```
+
+4. Use docker-compose setup. App will run on `8080` port receiving only `https` traffic.
 ```shell
 docker-compose -f docker-compose-mongo.yaml
 ```
@@ -19,11 +28,6 @@ or
 docker-compose -f docker-compose-psql.yaml
 ```
 
-3. TLS certs generation
-```shell
-openssl genrsa -out server.key 2048
-openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650
-```
 
 ## Development
 
@@ -66,3 +70,8 @@ https://github.com/golang/go/wiki/CodeReviewComments#interfaces
 https://rakyll.org/interface-pollution/
 https://www.ardanlabs.com/blog/2016/10/avoid-interface-pollution.html
 ```
+
+### Graceful shutdown
+The implementation is missing some parts e.g. graceful shutdown - an app should listen for os signals and gracefully shutdown whole thing(close db client connections). It was skipped for simplicity and this thing took me even more as expected :D 
+
+Nice article about that: https://www.rudderstack.com/blog/implementing-graceful-shutdown-in-go/

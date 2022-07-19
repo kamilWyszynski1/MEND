@@ -10,6 +10,7 @@ import (
 )
 
 //go:generate mockery --name=UserRepository --inpackage --filename=controller.mock.go
+//
 // UserRepository provides functionality to manager User entity.
 //
 // NOTE: I had discussion some time ago with my coworkers about place where interfaces should be placed.
